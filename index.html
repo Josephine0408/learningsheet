@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>學習策略互動學習單</title>
+  <meta name="description" content="平和國中特殊需求課程 - 學習策略領域二十週互動式學習單系統">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar-nav">
+      <div class="sidebar-header">
+        <h1>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          學習策略互動學習單
+        </h1>
+      </div>
+      
+      <!-- Semester Progress Bar -->
+      <div class="progress-panel">
+        <div class="progress-info">
+          <span>全學期學習進度</span>
+          <span id="global-progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="global-progress-bar"></div>
+        </div>
+      </div>
+      
+      <!-- Dynamic Sidebar Menu List -->
+      <nav class="sidebar-menu" id="sidebar-menu-list">
+        <!-- Injected by app.js -->
+      </nav>
+      
+      <!-- Sidebar Footer Tools -->
+      <div class="sidebar-footer">
+        <button class="home-btn" id="home-btn" title="回首頁儀表板">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </button>
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold;">平和國中 資源班</span>
+        <button class="theme-toggle" id="theme-toggle" title="切換深/淺色模式">
+          <!-- Injected by app.js -->
+        </button>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content" id="main-scroll-content">
+      
+      <!-- Top Sticky Navigation (Only visible on worksheet pages) -->
+      <header class="top-nav" id="top-nav" style="display: none;">
+        <div class="top-nav-title">
+          <h2 id="nav-week-title">載入中...</h2>
+        </div>
+        <div class="top-nav-actions">
+          <button class="btn" id="nav-btn-reset" title="重設本週資料">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M3 21v-5h5"></path>
+            </svg>
+            重設本週
+          </button>
+          <button class="btn btn-primary" id="nav-btn-print" title="列印或匯出成 PDF">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            列印 / 匯出 PDF
+          </button>
+        </div>
+      </header>
+      
+      <!-- View A: Dashboard Home -->
+      <section class="dashboard-home" id="dashboard-view">
+        <div class="dashboard-hero">
+          <div class="dashboard-hero-info">
+            <h2>學習策略 互動學習單系統</h2>
+            <p>歡迎來到學習策略課程！在這裡，你可以直接在線上完成每週的環境規劃、記憶練習及組織圖表。你的作答進度將會自動儲存。</p>
+            <button class="btn btn-primary" id="hero-start-btn" style="margin-top: 20px; padding: 12px 24px; font-size: 1rem; border-radius: 30px;">
+              開始第一課：我的學習避風港
+            </button>
+          </div>
+        </div>
+        
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <span class="stat-title">全學期總進度</span>
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span class="stat-value" id="dash-progress-percent">0%</span>
+              <span class="stat-desc" id="dash-completed-weeks">0 / 20 週已完成</span>
+            </div>
+            <div class="progress-bar-container" style="margin-top: 14px; height: 10px;">
+              <div class="progress-bar" id="dash-progress-bar" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="stat-card" style="justify-content: center;">
+            <span class="stat-title">使用提示</span>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+              ✏️ 畫布區支援<b>滑鼠與平板觸控</b>作畫，完成後可下載圖檔。<br>
+              💾 網頁具備<b>自動存檔</b>功能，隨時關閉都不用擔心。
+            </p>
+          </div>
+        </div>
+        
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 20px;">單元大綱與快速連結</h3>
+        <div class="units-grid" id="units-stats-grid">
+          <!-- Injected by app.js -->
+        </div>
+      </section>
+      
+      <!-- View B: Worksheet Form Display -->
+      <section class="worksheet-page" id="worksheet-view" style="display: none;">
+        <div id="worksheet-container">
+          <!-- Dynamically filled by app.js -->
+        </div>
+      </section>
+      
+    </main>
+    
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
