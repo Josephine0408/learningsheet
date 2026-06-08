@@ -951,7 +951,7 @@ function initCanvasDrawing(canvas, weekNo, weekState) {
 
 // Submit worksheet data to Google Sheets backend
 function submitWorksheet(weekNo, data) {
-  const url = localStorage.getItem('phjh_teacher_script_url') || 'https://script.google.com/macros/s/AKfycbwGjPJcE9UYesg9vVPPffdbp1jeq81E58TQ4WHAffCEPh7dPeVHGEBKsnqOo1UA4AQv8g/exec';
+  const url = 'https://script.google.com/macros/s/AKfycbwGjPJcE9UYesg9vVPPffdbp1jeq81E58TQ4WHAffCEPh7dPeVHGEBKsnqOo1UA4AQv8g/exec';
   if (!url) {
     alert('未設定教師後台網址！請先回到首頁儀表板，點選右上方「教師設定」貼上您的 Google Apps Script 網頁應用程式網址。');
     return;
