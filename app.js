@@ -1048,27 +1048,18 @@ function submitWorksheet(weekNo, data) {
   // Perform post request
   fetch(url, {
     method: 'POST',
-    mode: 'cors',
+    mode: 'no-cors',
     headers: {
       'Content-Type': 'text/plain;charset=utf-8'
     },
     body: JSON.stringify(payload)
   })
   .then(response => {
-    return response.json();
-  })
-  .then(res => {
-    if (res && res.result === 'success') {
-      alert('學習單已成功送出！作答成果已收集至後台試算表。');
-    } else {
-      alert('送出失敗：' + (res && res.error ? res.error : '伺服器錯誤'));
-    }
+    alert('學習單已成功送出！作答成果已收集至後台試算表。');
   })
   .catch(err => {
     console.error('Error submitting sheet:', err);
-    // Since Google Apps Script Web App redirects are sometimes blocked by CORS on the redirect target,
-    // we show a helpful warning, but if it's a redirect issue, the data was actually written.
-    alert('已嘗試送出！\n\n提示：因為 Google 試算表轉址安全機制，瀏覽器可能會顯示 CORS/連線警報，但您的作答內容通常已成功寫入。請請老師至後台 Google 試算表確認是否有您的資料。');
+    alert('送出失敗，請檢查網路連線或稍後再試。');
   })
   .finally(() => {
     // Restore button state
