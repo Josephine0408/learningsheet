@@ -64,6 +64,48 @@ function setupEventListeners() {
       navigateToWeek("01");
     });
   }
+
+  // Teacher Settings Modal Event Listeners
+  const settingsBtn = document.getElementById('btn-teacher-settings');
+  const settingsModal = document.getElementById('settings-modal');
+  const settingsCloseBtn = document.getElementById('settings-close-btn');
+  const settingsCancelBtn = document.getElementById('settings-cancel-btn');
+  const settingsSaveBtn = document.getElementById('settings-save-btn');
+  const scriptUrlInput = document.getElementById('teacher-script-url');
+
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      const savedUrl = localStorage.getItem('phjh_teacher_script_url') || 'https://script.google.com/macros/s/AKfycbzmOvbpSaixFE8l_EdXwMCrvIHLPx3vZeujLrGfkljjECBHPM7mbTU3KQHqmJ0FVyV6wQ/exec';
+      scriptUrlInput.value = savedUrl;
+      settingsModal.style.display = 'flex';
+    });
+  }
+
+  const closeModal = () => {
+    if (settingsModal) {
+      settingsModal.style.display = 'none';
+    }
+  };
+
+  if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeModal);
+  if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeModal);
+
+  if (settingsModal) {
+    settingsModal.addEventListener('click', (e) => {
+      if (e.target === settingsModal) {
+        closeModal();
+      }
+    });
+  }
+
+  if (settingsSaveBtn) {
+    settingsSaveBtn.addEventListener('click', () => {
+      const url = scriptUrlInput.value.trim();
+      localStorage.setItem('phjh_teacher_script_url', url);
+      alert('教師後台網址已儲存！');
+      closeModal();
+    });
+  }
 }
 
 // Apply visual theme class
@@ -700,6 +742,13 @@ function renderWorksheet(weekNo) {
       renderWorksheet(weekNo);
     }
   };
+
+  const submitBtn = document.getElementById('nav-btn-submit');
+  if (submitBtn) {
+    submitBtn.onclick = () => {
+      submitWorksheet(weekNo, data);
+    };
+  }
 }
 
 // Find previous/next week IDs
@@ -898,4 +947,133 @@ function initCanvasDrawing(canvas, weekNo, weekState) {
   }, { passive: false });
   
   canvas.addEventListener('touchend', stopDrawing);
+}
+
+// Submit worksheet data to Google Sheets backend
+function submitWorksheet(weekNo, data) {
+  const url = localStorage.getItem('phjh_teacher_script_url') || 'https://script.google.com/macros/s/AKfycbzmOvbpSaixFE8l_EdXwMCrvIHLPx3vZeujLrGfkljjECBHPM7mbTU3KQHqmJ0FVyV6wQ/exec';
+  if (!url) {
+    alert('未設定教師後台網址！請先回到首頁儀表板，點選右上方「教師設定」貼上您的 Google Apps Script 網頁應用程式網址。');
+    return;
+  }
+
+  // Validate student info
+  const name = (userState.studentInfo.name || '').trim();
+  const grade = (userState.studentInfo.grade || '').trim();
+  
+  if (!name) {
+    alert('請先在學習單上方填寫您的「姓名」！');
+    const nameInput = document.getElementById('student-name');
+    if (nameInput) {
+      nameInput.focus();
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  if (!grade) {
+    alert('請先在學習單上方填寫您的「年級」！');
+    const gradeInput = document.getElementById('student-grade');
+    if (gradeInput) {
+      gradeInput.focus();
+      gradeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
+  const weekState = userState.worksheets[weekNo] || { inputs: {}, checks: [], canvasData: null, feedback: { comment: '', score: '' } };
+
+  // Compile answers into formatted text
+  let answersText = '';
+  data.sections.forEach((sec, sIdx) => {
+    answersText += `【${sec.title}】\n`;
+    if (sec.type === 'text') {
+      answersText += `(內容說明)\n`;
+    } else if (sec.type === 'table') {
+      sec.rows.forEach((row, rIdx) => {
+        if (row[0] && row[0].startsWith('例：')) return; // Skip example row
+        
+        let rowParts = [];
+        row.forEach((cell, cIdx) => {
+          if (cell !== '') {
+            rowParts.push(cell);
+          } else {
+            const inputKey = `week-${weekNo}-sec-${sIdx}-row-${rIdx}-col-${cIdx}`;
+            const val = (weekState.inputs[inputKey] || '').trim();
+            rowParts.push(val ? `作答: ${val}` : `作答: (空白)`);
+          }
+        });
+        answersText += `- ${rowParts.join(' | ')}\n`;
+      });
+    } else if (sec.type === 'checklist') {
+      if (weekState.checks && weekState.checks.length > 0) {
+        sec.items.forEach((item, iIdx) => {
+          const checked = weekState.checks[iIdx] === true ? '✓' : '☐';
+          answersText += `- [${checked}] ${item}\n`;
+        });
+      } else {
+        answersText += `- (尚未勾選任何項目)\n`;
+      }
+    } else if (sec.type === 'draw_box') {
+      const hasDrawing = weekState.canvasData && weekState.canvasData !== 'blank';
+      answersText += `- 心智圖/畫布狀態: ${hasDrawing ? '學生已完成繪圖 (詳見圖檔欄位)' : '學生未在畫布作圖'}\n`;
+    }
+    answersText += '\n';
+  });
+
+  // Get score and comments
+  const score = weekState.feedback.score || '';
+  const comment = weekState.feedback.comment || '';
+
+  // Get submit button to show loading status
+  const submitBtn = document.getElementById('nav-btn-submit');
+  const originalHtml = submitBtn.innerHTML;
+  
+  // Set button to loading state
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = '0.7';
+  submitBtn.innerHTML = `<span class="spinner"></span> 傳送中...`;
+
+  // Prepare payload
+  const payload = {
+    studentName: name,
+    studentGrade: grade,
+    week: weekNo,
+    title: data.title,
+    answersText: answersText,
+    canvasData: (weekState.canvasData && weekState.canvasData !== 'blank') ? weekState.canvasData : '',
+    score: score,
+    teacherComment: comment
+  };
+
+  // Perform post request
+  fetch(url, {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    return response.json();
+  })
+  .then(res => {
+    if (res && res.result === 'success') {
+      alert('學習單已成功送出！作答成果已收集至後台試算表。');
+    } else {
+      alert('送出失敗：' + (res && res.error ? res.error : '伺服器錯誤'));
+    }
+  })
+  .catch(err => {
+    console.error('Error submitting sheet:', err);
+    // Since Google Apps Script Web App redirects are sometimes blocked by CORS on the redirect target,
+    // we show a helpful warning, but if it's a redirect issue, the data was actually written.
+    alert('已嘗試送出！\n\n提示：因為 Google 試算表轉址安全機制，瀏覽器可能會顯示 CORS/連線警報，但您的作答內容通常已成功寫入。請請老師至後台 Google 試算表確認是否有您的資料。');
+  })
+  .finally(() => {
+    // Restore button state
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    submitBtn.innerHTML = originalHtml;
+  });
 }
