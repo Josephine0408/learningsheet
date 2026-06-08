@@ -68,11 +68,17 @@
             </svg>
             重設本週
           </button>
-          <button class="btn btn-primary" id="nav-btn-print" title="列印或匯出成 PDF">
+          <button class="btn" id="nav-btn-print" title="列印或匯出成 PDF">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect>
             </svg>
-            列印 / 匯出 PDF
+            列印 / PDF
+          </button>
+          <button class="btn btn-primary" id="nav-btn-submit" title="將本週作答送出至試算表" style="background-color: #10b981; border: none; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 2 11 13 22 2"></polyline><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            送出學習單
           </button>
         </div>
       </header>
@@ -109,7 +115,18 @@
           </div>
         </div>
         
-        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 20px;">單元大綱與快速連結</h3>
+        <!-- Header with Teacher Settings button -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0;">單元大綱與快速連結</h3>
+          <button class="btn" id="btn-teacher-settings" title="教師後台設定">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            教師設定
+          </button>
+        </div>
+        
         <div class="units-grid" id="units-stats-grid">
           <!-- Injected by app.js -->
         </div>
@@ -124,6 +141,29 @@
       
     </main>
     
+  </div>
+
+  <!-- Teacher Settings Modal -->
+  <div class="modal-overlay" id="settings-modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>教師後台設定</h3>
+        <button class="modal-close-btn" id="settings-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+          在此貼上您的 <b>Google Apps Script 網頁應用程式網址</b>。設定成功後，學生在學習單上點選「送出學習單」時，作答資料會自動寫入您的 Google 試算表。
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary);">Google Apps Script Web App URL:</label>
+          <input type="text" id="teacher-script-url" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="settings-cancel-btn">取消</button>
+        <button class="btn btn-primary" id="settings-save-btn">儲存設定</button>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->
